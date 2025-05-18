@@ -62,7 +62,7 @@ macro_rules! higher_order_closure {(
             f: __Closure,
         ) -> __Closure
         where
-            __Closure : for<$($($hr ,)*)?> $crate::__::FnOnce($($ArgTy),*) $(-> $Ret)?,
+            __Closure : for<$($($hr ,)*)?> $crate::__::Fn($($ArgTy),*) $(-> $Ret)?,
             $($($($wc)*)?)?
         {
             f
@@ -77,7 +77,7 @@ macro_rules! higher_order_closure {(
 // macro internals
 #[doc(hidden)] /** Not part of the public API */ pub
 mod __ {
-    pub use ::core::ops::FnOnce;
+    pub use ::core::ops::Fn;
 }
 
 #[cfg_attr(feature = "ui-tests",
