@@ -33,6 +33,7 @@ macro_rules! higher_order_closure {(
         )?
     ])?
 
+    $(&$closure_lt: lifetime)?
     $( for<$($hr:lifetime),* $(,)?> )?
     $( move $(@$move:tt)?)?
     | $($arg_pat:tt : $ArgTy:ty),* $(,)?|
@@ -59,8 +60,8 @@ macro_rules! higher_order_closure {(
                 __Closure,
             >
         (
-            f: __Closure,
-        ) -> __Closure
+            f: $(&$closure_lt)? __Closure,
+        ) -> $(&$closure_lt)? __Closure
         where
             __Closure : for<$($($hr ,)*)?> $crate::__::Fn($($ArgTy),*) $(-> $Ret)?,
             $($($($wc)*)?)?
@@ -70,9 +71,32 @@ macro_rules! higher_order_closure {(
 
         __funnel__::<$($($($T ,)+)?)? _>
     })(
-        $(move $($move)?)? |$($arg_pat),*| $body
+        $crate::__closure!($(&$closure_lt)? $(move $($move)?)? |$($arg_pat),*| $body)
     )
 )}
+
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __closure {
+    (
+        $( move $(@$move:tt)?)?
+        | $($arg_pat:tt),* $(,)?|
+          $(-> $Ret:ty)?
+        $body:block
+    ) => {
+        $(move $($move)?)? |$($arg_pat),*| $body
+    };
+
+    (
+        &$closure_lt: lifetime
+        $( move $(@$move:tt)?)?
+        | $($arg_pat:tt),* $(,)?|
+          $(-> $Ret:ty)?
+        $body:block
+    ) => {
+        &$(move $($move)?)? |$($arg_pat),*| $body
+    }
+}
 
 // macro internals
 #[doc(hidden)] /** Not part of the public API */ pub

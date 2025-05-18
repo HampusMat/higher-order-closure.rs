@@ -346,6 +346,33 @@ fn main ()
 }
 ```
 
+#### Referencing the closure
+
+Since the macro internally creates a temporary value, creating a reference with a `'static` lifetime to the macro output in a conventional manner will not work.
+
+In order to create a `'static` reference to the annotated closure, `higher_order_signature!` can be instructed to create the reference for you.
+
+The macro can also be instructed to create a reference to the annotated closure with any lifetime desired.
+
+```rust
+#[macro_use]
+extern crate higher_order_closure;
+
+fn main ()
+{
+    let f = higher_order_closure! {
+        &'static for<'any> |x: &'any i32| -> &'any i32 {
+            x
+        }
+    };
+    {
+        let local = 42;
+        f(&local);
+    }
+    f(&42);
+}
+```
+
 [^2]: it generates a "closure identity" helper function, with the desired
 higher-order signatures embedded as `Fn` bounds on its parameters, thus making
 it act as a "funnel" that only lets closure with the right signature pass
