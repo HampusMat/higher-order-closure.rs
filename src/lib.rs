@@ -36,7 +36,7 @@ macro_rules! higher_order_closure {(
     $( for<$($hr:lifetime),* $(,)?> )?
     $( move $(@$move:tt)?)?
     | $($arg_pat:tt : $ArgTy:ty),* $(,)?|
-      -> $Ret:ty
+      $(-> $Ret:ty)?
     $body:block
 ) => (
     ({
@@ -62,7 +62,7 @@ macro_rules! higher_order_closure {(
             f: __Closure,
         ) -> __Closure
         where
-            __Closure : for<$($($hr ,)*)?> $crate::__::FnOnce($($ArgTy),*) -> $Ret,
+            __Closure : for<$($($hr ,)*)?> $crate::__::FnOnce($($ArgTy),*) $(-> $Ret)?,
             $($($($wc)*)?)?
         {
             f
